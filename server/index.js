@@ -6,6 +6,9 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// 解决跨域
+app.use(require('cors')());
+
 // connect to mongoDB
 const mongoose = require('mongoose');
 const db = require('./config/keys').mongoURI;

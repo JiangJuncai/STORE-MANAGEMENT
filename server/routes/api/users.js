@@ -31,10 +31,10 @@ router.post('/register', (req, res) => {
         newUser
           .save()
           .then(user => {
-            res.json(user);
+            res.json('用户注册成功！');
           })
           .catch(err => {
-            console.log(err);
+            res.status(400).json(err);
           });
       });
     }
