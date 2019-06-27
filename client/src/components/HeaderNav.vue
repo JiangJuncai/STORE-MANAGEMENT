@@ -6,16 +6,21 @@
         <span>店铺资金管理系统</span>
       </el-col>
       <el-col :span="3.5">
-        <span class="user">Manager:Username</span>
-        <el-dropdown trigger="click" @command="setDialogInfo">
-          <span class="el-dropdown-link">
-            <i class="el-icon-caret-bottom el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="info">个人信息</el-dropdown-item>
-            <el-dropdown-item command="logout">退出</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+        <span
+          class="identity"
+        >{{user.identity ? (user.identity=='manager' ? '管理员:' : '员工:') : '请登录'}}</span>
+        <span class="user" v-if="user.username">
+          {{user.username ? user.username : '请登录'}}
+          <el-dropdown trigger="click" @command="setDialogInfo">
+            <span class="el-dropdown-link">
+              <i class="el-icon-caret-bottom el-icon--right"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="info">个人信息</el-dropdown-item>
+              <el-dropdown-item command="logout">退出</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </span>
       </el-col>
     </el-row>
   </el-header>
@@ -23,7 +28,32 @@
 
 <script>
 export default {
-  name: 'headerNav'
+  name: 'headerNav',
+  computed: {
+    user() {
+      return this.$store.getters.user;
+    }
+  },
+  methods: {
+    setDialogInfo(command) {
+      switch (command) {
+        case 'info':
+          this.toInfo();
+          break;
+        case 'logout':
+          this.logout();
+          break;
+      }
+    },
+    toInfo() {
+      this.$router.push('/home/info');
+    },
+    logout() {
+      localStorage.removeItem('token');
+      this.$store.dispatch('clearCurrentState');
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 
@@ -33,7 +63,8 @@ export default {
   background-color: #fff;
   color: #304455;
   line-height: 60px;
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.45);
 }
 .title img {
   width: 32px;
@@ -44,6 +75,12 @@ export default {
   font-size: 24px;
   margin-left: 10px;
   vertical-align: middle;
+}
+.identity {
+  font-size: 16px;
+  font-weight: bold;
+  color: #58c18c;
+  margin-right: 5px;
 }
 .user {
   color: #304455;

@@ -10,7 +10,7 @@ export default {
   name: 'notFound',
   methods: {
     toHome() {
-      this.$router.push('/home');
+      this.$router.push('/index/home');
     }
   }
 };

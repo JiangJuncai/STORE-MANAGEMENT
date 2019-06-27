@@ -28,7 +28,9 @@ require('./config/passport')(passport);
 
 // use router
 const users = require('./routes/api/users');
+const profiles = require('./routes/api/profiles');
 app.use('/api/users', users);
+app.use('/api/profiles', profiles);
 
 app.listen(3000, () => {
   console.log('http://localhost:3000');

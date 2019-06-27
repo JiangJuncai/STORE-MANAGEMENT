@@ -62,9 +62,8 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.$axios.post('/users/login', this.loginForm).then(res => {
-            console.log(res.data);
             localStorage.setItem('token', res.data.token);
-            this.$router.push('/home');
+            this.$router.push('/index/home');
           });
         } else {
           this.$message({
