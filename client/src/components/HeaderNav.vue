@@ -16,37 +16,49 @@
               <i class="el-icon-caret-bottom el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="info">个人信息</el-dropdown-item>
+              <el-dropdown-item command="info">修改密码</el-dropdown-item>
               <el-dropdown-item command="logout">退出</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </span>
       </el-col>
     </el-row>
+    <ChangePassword :dialog="dialog" :user="user"></ChangePassword>
   </el-header>
 </template>
 
 <script>
+import ChangePassword from '@/components/ChangePassword.vue';
 export default {
   name: 'headerNav',
+  data() {
+    return {
+      dialog: {
+        show: false
+      }
+    };
+  },
   computed: {
     user() {
       return this.$store.getters.user;
     }
   },
+  components: {
+    ChangePassword
+  },
   methods: {
     setDialogInfo(command) {
       switch (command) {
         case 'info':
-          this.toInfo();
+          this.changePassword();
           break;
         case 'logout':
           this.logout();
           break;
       }
     },
-    toInfo() {
-      this.$router.push('/home/info');
+    changePassword() {
+      this.dialog.show = true;
     },
     logout() {
       localStorage.removeItem('token');

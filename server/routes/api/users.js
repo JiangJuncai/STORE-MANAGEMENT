@@ -114,17 +114,65 @@ router.delete(
   (req, res) => {
     User.findByIdAndRemove(req.params.id)
       .then(user => {
-        res.json({
-          success: true,
-          message: `删除用户${user.username}成功!`
-        });
+        res.json(`删除用户${user.username}成功!`);
       })
       .catch(err => {
-        res.json({
-          success: false,
-          message: '该用户不存在'
-        });
+        res.status(404).json('该用户不存在');
       });
+  }
+);
+
+/*
+ * $route PUT api/users/:id
+ * @desc edit a user
+ * @return message
+ * @access private
+ */
+router.put(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    User.findByIdAndUpdate(req.params.id, req.body)
+      .then(user => {
+        res.json('更改用户成功！');
+      })
+      .catch(err => {
+        res.status(404).json('更改用户失败！');
+      });
+  }
+);
+
+/*
+ * $route POST api/users/password/:id
+ * @desc change user's password
+ * @return message json
+ * @access private
+ */
+router.post(
+  '/password/:id',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    User.findById(req.params.id).then(user => {
+      bcrypt.compare(req.body.oldPassword, user.password, (err, isMatch) => {
+        if (err) throw err;
+        if (isMatch) {
+          bcrypt.hash(req.body.newPassword, 8, (err, hash) => {
+            if (err) throw err;
+            user.password = hash;
+            user
+              .save()
+              .then(user => {
+                res.json('修改密码成功！');
+              })
+              .catch(err => {
+                res.status(400).json('修改密码失败！');
+              });
+          });
+        } else {
+          res.status(400).json('密码输入错误！');
+        }
+      });
+    });
   }
 );
 
