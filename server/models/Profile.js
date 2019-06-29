@@ -15,17 +15,17 @@ const ProfileSchema = new Schema({
   // 额外支出
   otherExpend: {
     type: Number,
-    required: true
+    default: 0
   },
   // 进货支出
   foodsExpend: {
     type: Number,
-    required: true
+    default: 0
   },
   // 冻货支出
   frozenExpend: {
     type: Number,
-    required: true
+    default: 0
   },
   // 烤鸭只数
   duckCount: {
@@ -38,7 +38,7 @@ const ProfileSchema = new Schema({
     required: true
   },
   // 备注
-  isMarket: {
+  remark: {
     type: String,
     default: ''
   },

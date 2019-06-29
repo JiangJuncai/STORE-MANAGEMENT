@@ -74,4 +74,20 @@ router.delete(
   }
 );
 
+/*
+ * $route DELETE api/profiles/edit/:id
+ * @desc edit a profile by id
+ * @return json message
+ * @access private
+ */
+router.put('/edit/:id', (req, res) => {
+  Profile.findByIdAndUpdate(req.params.id, req.body)
+    .then(profile => {
+      res.json('编辑数据成功！');
+    })
+    .catch(err => {
+      res.status(400).json('编辑数据失败');
+    });
+});
+
 module.exports = router;

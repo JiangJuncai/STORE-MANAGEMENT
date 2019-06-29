@@ -1,18 +1,20 @@
 <template>
   <div class="fundlist">
     <el-row class="btn-area">
-      <el-col>
-        <el-button type="primary" size="small">主要按钮</el-button>
+      <el-col :span="22">1</el-col>
+      <el-col :span="2">
+        <el-button type="primary" size="small" @click="addProfile">添加数据</el-button>
       </el-col>
     </el-row>
+    <ProfileDialog :dialog="dialog" :profile="profile" @update="fetchProfles"></ProfileDialog>
     <el-table :data="profiles" border style="width: 100%" size="small">
       <el-table-column prop="date" :formatter="formatDate" label="日期" width="120" align="center"></el-table-column>
       <el-table-column prop="isMarket" label="集会日" width="80" align="center">
         <template slot-scope="scope">
           <span
-            :style="'font-size:20px;color:' + (scope.row.isMarket=='true' ? '#67C23A' : '#F56C6C')"
+            :style="'font-size:20px;color:' + (scope.row.isMarket==true ? '#67C23A' : '#F56C6C')"
           >
-            <i :class="'el-icon-circle-' + (scope.row.isMarket=='true' ? 'check' : 'close')"></i>
+            <i :class="'el-icon-circle-' + (scope.row.isMarket==true ? 'check' : 'close')"></i>
           </span>
         </template>
       </el-table-column>
@@ -47,53 +49,45 @@
         </template>
       </el-table-column>
       <el-table-column prop="remark" label="备注" align="center"></el-table-column>
-      <el-table-column label="操作" align="center" width="160">
+      <el-table-column label="操作" align="center" width="160" fixed="right">
         <template slot-scope="scope">
-          <el-button size="small" @click="changeIdentity(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="small" @click="editProfile(scope.$index, scope.row)">编辑</el-button>
           <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog title="用户编辑" :visible.sync="showDialog" :before-close="beforeCloseDialog">
-      <el-form :model="userForm" ref="userForm" :rules="userRules">
-        <el-form-item label="用户名" label-width="80px" prop="username">
-          <el-input v-model="userForm.username"></el-input>
-        </el-form-item>
-        <el-form-item label="角色" label-width="80px">
-          <el-select v-model="userForm.identity" placeholder="请选择角色权限">
-            <el-option label="管理员" value="manager"></el-option>
-            <el-option label="员工" value="employee"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="cancelDialog">取 消</el-button>
-        <el-button type="primary" @click="editUser('userForm')">确 定</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import facha from 'fecha';
+import ProfileDialog from '@/components/ProfileDialog.vue';
 export default {
   name: 'fundlist',
   data() {
     return {
       profiles: [],
-      showDialog: false,
-      userForm: {},
-      userRules: {
-        username: [
-          { required: true, message: '用户名不能为空', trigger: 'blur' },
-          {
-            pattern: /^[a-zA-Z0-9_-]{4,16}$/,
-            message: '4到16位（字母，数字，下划线，减号）',
-            trigger: 'blur'
-          }
-        ]
+      dialog: {
+        show: false,
+        title: '',
+        option: ''
+      },
+      profile: {
+        _id: '',
+        date: '',
+        isMarket: false,
+        duckCount: '',
+        income: '',
+        foodsExpend: '',
+        frozenExpend: '',
+        otherExpend: '',
+        profit: 0,
+        remark: ''
       }
     };
+  },
+  components: {
+    ProfileDialog
   },
   methods: {
     // 格式化时间
@@ -101,25 +95,62 @@ export default {
       const date = facha.format(new Date(cellValue), 'YYYY-MM-DD');
       return date;
     },
-    // 编辑按钮事件
-    changeIdentity(index, row) {
-      this.showDialog = true;
-      this.userForm = row;
+    // 添加profile按钮
+    addProfile() {
+      this.dialog = {
+        show: true,
+        title: '添加数据',
+        option: 'add'
+      };
+      this.profile = {
+        date: '',
+        isMarket: false,
+        duckCount: '',
+        income: '',
+        foodsExpend: '',
+        frozenExpend: '',
+        otherExpend: '',
+        profit: '',
+        remark: ''
+      };
+    },
+    editProfile(index, row) {
+      this.dialog = {
+        show: true,
+        title: '编辑数据',
+        option: 'edit'
+      };
+      this.profile = {
+        _id: row._id,
+        date: new Date(row.date),
+        isMarket: row.isMarket,
+        duckCount: row.duckCount,
+        income: row.income,
+        foodsExpend: row.foodsExpend,
+        frozenExpend: row.frozenExpend,
+        otherExpend: row.otherExpend,
+        profit: row.profit,
+        remark: row.remark
+      };
     },
     // 删除用户
     handleDelete(index, row) {
-      this.$confirm(`是否删除用户${row.username}?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
+      this.$confirm(
+        `确认删除${facha.format(new Date(row.date), 'YYYY-MM-DD')}日的数据?`,
+        '删除',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      )
         .then(() => {
-          this.$axios.delete(`/users/${row._id}`).then(res => {
+          this.$axios.delete(`/profiles/${row._id}`).then(res => {
             this.$message({
               type: 'success',
               message: res.data
             });
-            this.fetchUserlist();
+            this.fetchProfles();
           });
         })
         .catch(() => {
@@ -129,45 +160,11 @@ export default {
           });
         });
     },
-    // 获取用户列表
-    fetchUserlist() {
-      this.$axios.get('/users').then(res => {
-        this.users = res.data;
-      });
-    },
     // 获取资金列表
     fetchProfles() {
       this.$axios.get('/profiles').then(res => {
         this.profiles = res.data;
       });
-    },
-    // 编辑用户
-    editUser() {
-      this.$refs['userForm'].validate(valid => {
-        if (valid) {
-          this.$axios
-            .put(`/users/${this.userForm._id}`, this.userForm)
-            .then(res => {
-              this.$message({
-                type: 'success',
-                message: res.data
-              });
-              this.showDialog = false;
-            });
-        } else {
-          this.$message.error('表单填写错误！');
-          return false;
-        }
-      });
-    },
-    // 关掉dialog前，请求userlist
-    beforeCloseDialog(done) {
-      this.fetchUserlist();
-      done();
-    },
-    cancelDialog() {
-      this.showDialog = false;
-      this.fetchUserlist();
     }
   },
   created() {
@@ -178,6 +175,7 @@ export default {
 
 <style scoped>
 .btn-area {
+  width: 100%;
   margin-bottom: 10px;
 }
 </style>
