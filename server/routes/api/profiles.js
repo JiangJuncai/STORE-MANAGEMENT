@@ -35,20 +35,28 @@ router.post(
 );
 
 /*
- * $route GET api/profiles
- * @desc get all profiles
+ * $route POST api/profiles
+ * @desc get one page of profiles
  * @return profiles list
  * @access private
  */
-router.get(
+router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
-  (req, res) => {
+  async (req, res) => {
+    const total = await Profile.countDocuments();
     Profile.find()
+      .skip((req.body.currentPage - 1) * 8)
+      .limit(8)
+      .sort({ date: -1 })
       .then(profiles => {
-        res.json(profiles);
+        res.json({
+          profiles: profiles,
+          total: total
+        });
       })
       .catch(err => {
+        console.log(err);
         res.status(400).json('获取收益列表错误！');
       });
   }
@@ -80,14 +88,48 @@ router.delete(
  * @return json message
  * @access private
  */
-router.put('/edit/:id', (req, res) => {
-  Profile.findByIdAndUpdate(req.params.id, req.body)
-    .then(profile => {
-      res.json('编辑数据成功！');
-    })
-    .catch(err => {
-      res.status(400).json('编辑数据失败');
+router.put(
+  '/edit/:id',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    Profile.findByIdAndUpdate(req.params.id, req.body)
+      .then(profile => {
+        res.json('编辑数据成功！');
+      })
+      .catch(err => {
+        res.status(400).json('编辑数据失败');
+      });
+  }
+);
+/*
+ * $route POST api/profiles/query
+ * @desc query profiles by date
+ * @return profiles list
+ * @access private
+ */
+router.post(
+  '/query',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    const totalProfiles = await Profile.find({
+      date: { $regex: req.body.queryDate }
     });
-});
+    const total = totalProfiles.length;
+    Profile.find({ date: { $regex: req.body.queryDate } })
+      .skip((req.body.currentPage - 1) * 8)
+      .limit(8)
+      .sort({ date: -1 })
+      .then(profiles => {
+        res.json({
+          profiles: profiles,
+          total: total
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(400).json('数据查询错误！');
+      });
+  }
+);
 
 module.exports = router;

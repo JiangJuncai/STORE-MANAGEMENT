@@ -1,15 +1,29 @@
 <template>
   <div class="fundlist">
     <el-row class="btn-area">
-      <el-col :span="22">1</el-col>
-      <el-col :span="2">
-        <el-button type="primary" size="small" @click="addProfile">添加数据</el-button>
+      <el-col :span="20">
+        <el-date-picker
+          value-format="yyyy-MM"
+          v-model="queryDate"
+          type="month"
+          placeholder="选择要查询的月份"
+        ></el-date-picker>
+        <el-button
+          @click="queryData"
+          type="primary"
+          icon="el-icon-search"
+          size="medium"
+          style="margin-left:20px"
+        >查询</el-button>
+      </el-col>
+      <el-col :span="4" style="text-align:right">
+        <el-button type="primary" size="medium" @click="addProfile">添加数据</el-button>
       </el-col>
     </el-row>
     <ProfileDialog :dialog="dialog" :profile="profile" @update="fetchProfles"></ProfileDialog>
     <el-table :data="profiles" border style="width: 100%" size="small">
       <el-table-column prop="date" :formatter="formatDate" label="日期" width="120" align="center"></el-table-column>
-      <el-table-column prop="isMarket" label="集会日" width="80" align="center">
+      <el-table-column prop="isMarket" label="集会日" width="70" align="center">
         <template slot-scope="scope">
           <span
             :style="'font-size:20px;color:' + (scope.row.isMarket==true ? '#67C23A' : '#F56C6C')"
@@ -18,37 +32,37 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column prop="duckCount" label="烤鸭数" width="95" align="center">
+      <el-table-column prop="duckCount" label="烤鸭数" align="center">
         <template slot-scope="scope">
           <span style="color: #E6A23C">{{scope.row.duckCount}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="income" label="营业额" width="95" align="center">
+      <el-table-column prop="income" label="营业额" align="center">
         <template slot-scope="scope">
           <span style="color: #409EFF">{{scope.row.income}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="foodsExpend" label="进货支出" width="95" align="center">
+      <el-table-column prop="foodsExpend" label="进货支出" align="center">
         <template slot-scope="scope">
           <span style="color: #F56C6C">{{scope.row.foodsExpend}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="frozenExpend" label="冻鸭支出" width="95" align="center">
+      <el-table-column prop="frozenExpend" label="冻鸭支出" align="center">
         <template slot-scope="scope">
           <span style="color: #F56C6C">{{scope.row.frozenExpend}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="otherExpend" label="其它支出" width="95" align="center">
+      <el-table-column prop="otherExpend" label="其它支出" align="center">
         <template slot-scope="scope">
           <span style="color: #F56C6C">{{scope.row.otherExpend}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="profit" label="利润" width="95" align="center">
+      <el-table-column prop="profit" label="利润" align="center">
         <template slot-scope="scope">
           <span style="color: #67C23A">{{scope.row.profit}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="remark" label="备注" align="center"></el-table-column>
+      <el-table-column prop="remark" label="备注" width="180" align="center"></el-table-column>
       <el-table-column label="操作" align="center" width="160" fixed="right">
         <template slot-scope="scope">
           <el-button size="small" @click="editProfile(scope.$index, scope.row)">编辑</el-button>
@@ -56,6 +70,17 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-row style="margin-top:10px; text-align:right">
+      <el-col :span="24">
+        <el-pagination
+          @current-change="handleCurrentChange"
+          :current-page.sync="paginations.currentPage"
+          :page-size="8"
+          layout="prev, pager, next, jumper"
+          :total="paginations.total"
+        ></el-pagination>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -83,7 +108,13 @@ export default {
         otherExpend: '',
         profit: 0,
         remark: ''
-      }
+      },
+      paginations: {
+        currentPage: 1,
+        total: 1
+      },
+      queryDate: '',
+      isQuery: false
     };
   },
   components: {
@@ -110,7 +141,7 @@ export default {
         foodsExpend: '',
         frozenExpend: '',
         otherExpend: '',
-        profit: '',
+        profit: 0,
         remark: ''
       };
     },
@@ -122,7 +153,7 @@ export default {
       };
       this.profile = {
         _id: row._id,
-        date: new Date(row.date),
+        date: row.date,
         isMarket: row.isMarket,
         duckCount: row.duckCount,
         income: row.income,
@@ -162,9 +193,28 @@ export default {
     },
     // 获取资金列表
     fetchProfles() {
-      this.$axios.get('/profiles').then(res => {
-        this.profiles = res.data;
+      this.$axios.post('/profiles', this.paginations).then(res => {
+        this.paginations.total = res.data.total;
+        this.profiles = res.data.profiles;
       });
+    },
+    handleCurrentChange(val) {
+      this.paginations.currentPage = val;
+      this.isQuery ? this.queryData() : this.fetchProfles();
+    },
+    queryData() {
+      if (this.queryDate) {
+        this.isQuery = true;
+        console.log(typeof this.queryDate);
+        this.paginations.queryDate = this.queryDate;
+        this.$axios.post('/profiles/query', this.paginations).then(res => {
+          this.paginations.total = res.data.total;
+          this.profiles = res.data.profiles;
+        });
+      } else {
+        this.isQuery = false;
+        this.fetchProfles();
+      }
     }
   },
   created() {
@@ -177,5 +227,9 @@ export default {
 .btn-area {
   width: 100%;
   margin-bottom: 10px;
+}
+.el-table--small {
+  font-size: 14px;
+  color: #304455;
 }
 </style>

@@ -7,6 +7,7 @@ import Login from './views/Login.vue';
 import NotFound from './views/404.vue';
 import UserList from './views/UserList.vue';
 import FundList from './views/FundList.vue';
+import ProfitList from './views/ProfitList.vue';
 
 Vue.use(Router);
 
@@ -25,7 +26,8 @@ const router = new Router({
         { path: '', component: Home },
         { path: 'home', name: 'home', component: Home },
         { path: 'userlist', name: 'userlist', component: UserList },
-        { path: 'fundlist', name: 'fundlist', component: FundList }
+        { path: 'fundlist', name: 'fundlist', component: FundList },
+        { path: 'profitlist', name: 'profitlist', component: ProfitList }
       ]
     },
     {

@@ -43,8 +43,8 @@ const ProfileSchema = new Schema({
     default: ''
   },
   date: {
-    type: Date,
-    default: Date.now()
+    type: String,
+    required: true
   }
 });
 

@@ -7,16 +7,16 @@
       </el-menu-item>
       <el-submenu index="1">
         <template slot="title">
-          <i class="el-icon-s-order"></i>资金管理
+          <i class="el-icon-s-order"></i>收支记录
         </template>
-        <el-menu-item index="/index/fundlist">资金列表</el-menu-item>
+        <el-menu-item index="/index/fundlist">收支列表</el-menu-item>
       </el-submenu>
       <el-submenu index="2">
         <template slot="title">
-          <i class="el-icon-s-data"></i>收入统计
+          <i class="el-icon-s-data"></i>利润统计
         </template>
-        <el-menu-item index="2-1">收入列表</el-menu-item>
-        <el-menu-item index="2-2">收入图表</el-menu-item>
+        <el-menu-item index="/index/profitlist">利润列表</el-menu-item>
+        <el-menu-item index="2-2">利润图表</el-menu-item>
       </el-submenu>
       <el-submenu index="3">
         <template slot="title">

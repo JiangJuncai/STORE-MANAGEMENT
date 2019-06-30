@@ -4,7 +4,12 @@
       <el-tabs tab-position="left">
         <el-tab-pane label="日常配置">
           <el-form-item prop="date" label="日期" label-width="80px">
-            <el-date-picker v-model="profileForm.date" type="datetime" placeholder="选择日期时间"></el-date-picker>
+            <el-date-picker
+              value-format="yyyy-MM-dd"
+              v-model="profileForm.date"
+              type="date"
+              placeholder="选择日期"
+            ></el-date-picker>
           </el-form-item>
           <el-form-item prop="isMarket" label="集会日" label-width="80px">
             <el-radio-group v-model="profileForm.isMarket">
@@ -16,7 +21,7 @@
             <el-input
               type="number"
               v-model.number="profileForm.duckCount"
-              placeholder="请输入内容"
+              placeholder="请输入数量"
               clearable
             >
               <template slot="append">只</template>
@@ -81,7 +86,6 @@
 </template>
 
 <script>
-import { callbackify } from 'util';
 export default {
   name: 'profile-dialog',
   data() {
@@ -89,7 +93,7 @@ export default {
       profileRules: {
         date: [
           {
-            type: 'date',
+            type: 'string',
             required: true,
             message: '请选择时间',
             triggle: 'blur'
@@ -200,7 +204,7 @@ export default {
       });
     },
     beforeDialogOpen() {
-      if (this.dialog.option == 'add') {
+      if (this.dialog.option == 'add' && this.$refs['profileForm']) {
         this.$refs['profileForm'].resetFields();
       }
     }
