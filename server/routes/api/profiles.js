@@ -24,7 +24,10 @@ router.post(
   '/add',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    Profile.create(req.body)
+    const profile = req.body;
+    profile.year = req.body.date.split('-')[0];
+    profile.month = req.body.date.split('-')[1];
+    Profile.create(profile)
       .then(profile => {
         res.json('数据添加成功！');
       })

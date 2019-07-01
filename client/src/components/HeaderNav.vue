@@ -2,8 +2,8 @@
   <el-header>
     <el-row type="flex" justify="space-between" class="header">
       <el-col class="title" :span="6">
-        <img src="../assets/logo.png" alt>
-        <span>店铺资金管理系统</span>
+        <img src="../assets/logo.png" alt />
+        <span>店铺流水管理系统</span>
       </el-col>
       <el-col :span="3.5">
         <span

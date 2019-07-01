@@ -16,7 +16,6 @@
           <i class="el-icon-s-data"></i>利润统计
         </template>
         <el-menu-item index="/index/profitlist">利润列表</el-menu-item>
-        <el-menu-item index="2-2">利润图表</el-menu-item>
       </el-submenu>
       <el-submenu index="3">
         <template slot="title">

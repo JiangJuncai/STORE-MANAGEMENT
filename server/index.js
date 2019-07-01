@@ -11,7 +11,7 @@ app.use(require('cors')());
 
 // connect to mongoDB
 const mongoose = require('mongoose');
-const db = require('./config/keys').mongoURI;
+const db = require('./config/keys').couldMongoURI;
 mongoose
   .connect(db, { useNewUrlParser: true, useFindAndModify: false })
   .then(() => {
@@ -29,8 +29,10 @@ require('./config/passport')(passport);
 // use router
 const users = require('./routes/api/users');
 const profiles = require('./routes/api/profiles');
+const income = require('./routes/api/income');
 app.use('/api/users', users);
 app.use('/api/profiles', profiles);
+app.use('/api/income', income);
 
 app.listen(3000, () => {
   console.log('http://localhost:3000');

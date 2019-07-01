@@ -205,7 +205,6 @@ export default {
     queryData() {
       if (this.queryDate) {
         this.isQuery = true;
-        console.log(typeof this.queryDate);
         this.paginations.queryDate = this.queryDate;
         this.$axios.post('/profiles/query', this.paginations).then(res => {
           this.paginations.total = res.data.total;
