@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../../models/User');
 const passport = require('passport');
+const REGISTER_KEY = require('../../config/keys').registerKey;
 
 /*
  * $route POST api/users/register
@@ -15,30 +16,34 @@ const passport = require('passport');
  */
 router.post('/register', (req, res) => {
   // 查看username是否已被注册
-  User.findOne({ username: req.body.username }).then(user => {
-    if (user) {
-      res.status(400).json('该用户名已存在！');
-    } else {
-      const newUser = new User({
-        username: req.body.username,
-        password: req.body.password,
-        identity: req.body.identity
-      });
-      // 给用户密码进行加密
-      bcrypt.hash(newUser.password, 8, (err, hash) => {
-        if (err) throw err;
-        newUser.password = hash;
-        newUser
-          .save()
-          .then(user => {
-            res.json('用户注册成功！');
-          })
-          .catch(err => {
-            res.status(400).json(err);
-          });
-      });
-    }
-  });
+  if (req.body.key == REGISTER_KEY) {
+    User.findOne({ username: req.body.username }).then(user => {
+      if (user) {
+        res.status(400).json('该用户名已存在！');
+      } else {
+        const newUser = new User({
+          username: req.body.username,
+          password: req.body.password,
+          identity: req.body.identity
+        });
+        // 给用户密码进行加密
+        bcrypt.hash(newUser.password, 8, (err, hash) => {
+          if (err) throw err;
+          newUser.password = hash;
+          newUser
+            .save()
+            .then(user => {
+              res.json('用户注册成功！');
+            })
+            .catch(err => {
+              res.status(400).json(err);
+            });
+        });
+      }
+    });
+  } else {
+    res.status(404).json('注册码错误！');
+  }
 });
 
 /*

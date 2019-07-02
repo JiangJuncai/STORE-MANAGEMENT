@@ -22,6 +22,9 @@
               <el-option label="员工" value="employee"></el-option>
             </el-select>
           </el-form-item>
+          <el-form-item label="注册码" prop="key">
+            <el-input type="text" v-model="registerForm.key"></el-input>
+          </el-form-item>
           <el-form-item label="密码" prop="password">
             <el-input type="password" v-model="registerForm.password"></el-input>
           </el-form-item>
@@ -53,7 +56,8 @@ export default {
         username: '',
         password: '',
         password2: '',
-        identity: ''
+        identity: '',
+        key: ''
       },
       registerRules: {
         username: [
@@ -63,6 +67,10 @@ export default {
             message: '4到16位（字母，数字，下划线，减号）',
             trigger: 'blur'
           }
+        ],
+        key: [
+          { required: true, message: '请输入注册码', trigger: 'blur' },
+          {max: 20, message: '注册码过长', trigger:'blur'}
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },

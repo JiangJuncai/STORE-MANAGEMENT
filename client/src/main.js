@@ -10,7 +10,7 @@ import axios from './http';
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.prototype.$axios = axios;
-axios.defaults.baseURL = 'http://localhost:3000/api';
+axios.defaults.baseURL = 'https://storeheroku.herokuapp.com/api';
 
 new Vue({
   router,
